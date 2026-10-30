@@ -27,6 +27,6 @@ The preview tool's explicit viewport override did not reliably switch an existin
 
 - Real Chrome installation, permission prompt and real browsing-history transfer require explicit approval; not performed.
 - Chrome Web Store submission/review is external and has not occurred. Package is ready for unpacked testing, with submission preparation notes; owner assets/contact and review remain.
-- Live GitHub Pages publication depends on repository Pages configuration and successful Actions execution. Local build success is not deployment proof.
+- Repository made public with explicit owner approval; GitHub Pages configured to use GitHub Actions. Earlier CI runs passed install, 13 tests and build, then failed because Pages was not yet enabled. A fresh deployment is being triggered after configuration; live verification remains pending.
 - No automatic live retailer extraction or price verification. Product links/catalogs are supported; prices are supplied snapshots and availability is unknown.
 - No personal records analyzed: 0. No personalized products can be recommended without authorized data and real catalog entries.
