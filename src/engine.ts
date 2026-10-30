@@ -11,7 +11,7 @@ export function domain(url?:string){try{return new URL(url!).hostname.replace(/^
 const brands=['Apple','Samsung','Sony','Dell','Nike','Adidas','Uniqlo','Zara','Sephora','IKEA','Wayfair','Patagonia','REI'];
 function timestamp(v:unknown){if(typeof v==='number'||(typeof v==='string'&&/^\d+(\.\d+)?$/.test(v))){const n=Number(v);return n<1e11?n*1000:n;}const n=Date.parse(String(v));return Number.isFinite(n)?n:NaN}
 function normalize(raw:any,source:string,index:number):RecordItem|undefined{
- const url=safeURL(raw.url||raw.titleUrl||raw.link);let title=String(raw.title||raw.name||raw.text||'').slice(0,1000);if(!title&&url)title=domain(url);const time=timestamp(raw.time??raw.lastVisitTime??raw.timestamp??raw.date??raw.create_time);if(!title||!Number.isFinite(time)||time>Date.now()+86400000)return;
+ const url=safeURL(raw.url||raw.titleUrl||raw.link);let title=String(raw.title||raw.name||raw.text||'').slice(0,1000);if(!title&&url)title=domain(url);const time=timestamp(raw.time??(raw.time_usec!==undefined?Number(raw.time_usec)/1000:undefined)??raw.lastVisitTime??raw.timestamp??raw.date??raw.create_time);if(!title||!Number.isFinite(time)||time>Date.now()+86400000)return;
  // Sensitive records remain unclassified and do not contribute text to profile inference.
  const text=title+' '+(url||'');const category=categoryFor(text);const brand=category==='Unclassified'?undefined:brands.find(b=>new RegExp('\\b'+b+'\\b','i').test(text.replace(/[._/\-]/g,' ')));
  return {id:crypto.randomUUID?.()||`${source}-${index}`,source,url,title,time,kind:raw.kind==='statement'?'statement':raw.kind==='order'?'order':'visit',category,brand};
