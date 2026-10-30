@@ -1,0 +1,23 @@
+import {useEffect,useRef} from 'react';
+import * as d3 from 'd3';
+import Graph from 'graphology';
+import louvain from 'graphology-communities-louvain';
+import {categories,colors,domain,type RecordItem} from './engine';
+type N=d3.SimulationNodeDatum&{id:string;label:string;color:string;weight:number;records:RecordItem[];community?:number};
+export default function Universe({records,search,onSelect}:{records:RecordItem[];search:string;onSelect:(title:string,r:RecordItem[])=>void}){
+ const ref=useRef<SVGSVGElement>(null);
+ useEffect(()=>{if(!ref.current)return;const svg=d3.select(ref.current);svg.selectAll('*').remove();if(!records.length)return;
+ const graph=new Graph({type:'undirected'});const nodes=new Map<string,N>();const links=new Map<string,{source:string;target:string;weight:number}>();
+ function node(id:string,label:string,color:string,r:RecordItem){if(!nodes.has(id))nodes.set(id,{id,label,color,weight:0,records:[]});const n=nodes.get(id)!;n.weight++;n.records.push(r)}
+ function link(a:string,b:string){if(a===b)return;const key=[a,b].sort().join('|');const e=links.get(key);if(e)e.weight++;else links.set(key,{source:a,target:b,weight:1})}
+ records.forEach(r=>{if(r.category==='Unclassified')return;const c='c:'+r.category,s='s:'+domain(r.url),color=colors[categories.indexOf(r.category)];node(c,r.category,color,r);node(s,domain(r.url),color,r);link(c,s);if(r.brand){const b='b:'+r.brand;node(b,r.brand,color,r);link(s,b);link(c,b)}});
+ const ns=[...nodes.values()].sort((a,b)=>b.weight-a.weight).slice(0,180);const ids=new Set(ns.map(n=>n.id));const ls=[...links.values()].filter(l=>ids.has(l.source)&&ids.has(l.target));ns.forEach(n=>graph.addNode(n.id));ls.forEach(l=>graph.addEdge(l.source,l.target,{weight:l.weight}));if(graph.size){const communities=louvain(graph);ns.forEach(n=>n.community=communities[n.id])}
+ const g=svg.append('g');svg.call(d3.zoom<SVGSVGElement,unknown>().scaleExtent([.3,5]).on('zoom',e=>g.attr('transform',e.transform)));
+ const line=g.append('g').selectAll('line').data(ls).join('line').attr('stroke','#9f9cce').attr('stroke-opacity',.22).attr('stroke-width',d=>Math.min(5,Math.sqrt(d.weight)));
+ const groups=g.append('g').selectAll<SVGGElement,N>('g').data(ns).join('g').attr('tabindex',0).attr('role','button').attr('aria-label',d=>`${d.label}, ${d.weight} records`).style('cursor','pointer').attr('opacity',d=>!search||d.label.toLowerCase().includes(search.toLowerCase())?1:.12).on('click',(_,d)=>onSelect(`${d.label} · community ${d.community??0}`,d.records)).on('keydown',(e,d)=>{if(e.key==='Enter')onSelect(d.label,d.records)});
+ groups.append('circle').attr('r',d=>8+Math.sqrt(d.weight)*3).attr('fill',d=>d.color).attr('fill-opacity',.16).attr('stroke',d=>d.color).attr('stroke-opacity',.7);groups.append('circle').attr('r',3).attr('fill',d=>d.color);groups.append('text').text(d=>d.label).attr('y',d=>18+Math.sqrt(d.weight)*3).attr('text-anchor','middle').attr('fill','currentColor').attr('font-size',11);groups.append('title').text(d=>`${d.label}: ${d.weight} supporting records. Community ${d.community??0}. Click to inspect.`);
+ const simulation=d3.forceSimulation(ns).force('link',d3.forceLink<N,any>(ls).id(d=>d.id).distance(105)).force('charge',d3.forceManyBody().strength(-260)).force('center',d3.forceCenter(400,240)).force('collision',d3.forceCollide<N>().radius(d=>25+Math.sqrt(d.weight)*3)).on('tick',()=>{line.attr('x1',d=>(d.source as any).x).attr('y1',d=>(d.source as any).y).attr('x2',d=>(d.target as any).x).attr('y2',d=>(d.target as any).y);groups.attr('transform',d=>`translate(${d.x},${d.y})`)});
+ groups.call(d3.drag<SVGGElement,N>().on('start',(e,d)=>{if(!e.active)simulation.alphaTarget(.3).restart();d.fx=d.x;d.fy=d.y}).on('drag',(e,d)=>{d.fx=e.x;d.fy=e.y}).on('end',(e,d)=>{if(!e.active)simulation.alphaTarget(0);d.fx=null;d.fy=null}));return()=>{simulation.stop()};
+ },[records,search,onSelect]);
+ return <div className="universe"><svg ref={ref} viewBox="0 0 800 480" aria-label="Interactive evidence network"/>{!records.some(r=>r.category!=='Unclassified')&&<div className="orbital"><div className="orbit o1"/><div className="orbit o2"/><div className="orbit o3"/><div className="core">✦</div><span className="orb-label">YOUR INTEREST UNIVERSE</span><p>Connect your data to see the connections.</p><small>Empty canvas · no personal data analyzed</small></div>}<div className="graph-caption">{records.length?'Scroll to zoom · drag to explore · select a node for evidence':'A universe built from your own signals'}</div></div>
+}
