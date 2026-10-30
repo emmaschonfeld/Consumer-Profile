@@ -4,3 +4,5 @@
 
 @media(max-width:700px){.sidebar{visibility:hidden}.sidebar.open{visibility:visible}}
 [data-theme=light] .welcome button{color:#725195}[data-theme=light] .welcome-icon{background:#e7dcf4;color:#8660b9;border-color:#ccb5e4}
+
+.manual-connection{font-size:10px;color:var(--muted);margin:18px 0}.manual-connection summary{cursor:pointer}

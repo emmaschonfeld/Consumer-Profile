@@ -4,17 +4,19 @@ React, TypeScript, Vite, D3 force networks, Graphology and Louvain communities. 
 
 ## Run
 
+On this Mac, double-click `Start Orbit.command` in the project folder. It uses the existing Codex Node runtime if Node is not on PATH. No manual build-tool configuration is needed.
+
 Node 22+, pnpm 11.25.0: `pnpm install`, `pnpm test`, `pnpm dev`. Dashboard: http://localhost:5173/Consumer-Profile/. `pnpm build` creates `dist/` for GitHub Pages. Base path is `/Consumer-Profile/`.
 
 ## Connect Chrome (unpublished testing extension)
 
 1. Download the extension ZIP from Connect data, unzip it, open `chrome://extensions`, enable Developer mode, click Load unpacked, select the extracted folder.
-2. Copy its 32-letter extension ID into Connect data. Open the extension toolbar popup and approve history access through Chrome's permission prompt.
+2. Open the extension toolbar popup, approve history access through Chrome's permission prompt, then click Open authorized dashboard. The popup passes its public extension ID via a temporary fragment, which is removed immediately; no personal data is put in the URL. Manual ID entry remains a fallback for localhost testing.
 3. Select 7, 30, or 90 days in the dashboard and click Analyze history. This only reads history after an explicit dashboard action. No continuous collection.
 
 Chrome Web Store publication has NOT occurred. No listing URL exists. Publishing requires the owner's developer account, submission, and Google review. Unpacked extensions cannot be silently installed. Real installation testing requires explicit user approval and Chrome.
 
-The connector accepts only the configured dashboard path on the exact production origin and localhost/127.0.0.1 port 5173 for testing. Production submissions should remove the two localhost matches. An extension ID is required until a stable Web Store ID exists; insert that verified ID into the UI after publication to remove the manual step. Neither browser automation nor Google login grants history permission.
+The connector accepts only the configured dashboard path on the exact production origin and localhost/127.0.0.1 port 5173 for testing. Production submissions should remove the two localhost matches. The popup identifies its own extension ID automatically. Manual ID entry remains a fallback. After publication, use the verified stable store ID to support direct dashboard-first connection. Neither browser automation nor Google login grants history permission.
 
 ## Imports
 
