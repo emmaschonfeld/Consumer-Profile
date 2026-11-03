@@ -10,7 +10,8 @@ export async function handle(message,sender,api){
  const items=await api.history.search({text:'',startTime,endTime,maxResults:5000});
  const records=[];
  // Query visit events because HistoryItem.visitCount is lifetime and lastVisitTime is not a timeline.
- for(let i=0;i<items.length;i+=20){await Promise.all(items.slice(i,i+20).map(async item=>{let u;try{u=new URL(item.url);if(!['https:','http:'].includes(u.protocol))return;u.search='';u.hash='';u.username='';u.password=''}catch{return}const visits=await api.history.getVisits({url:item.url});for(const v of visits){if(v.visitTime>=startTime&&v.visitTime<=endTime)records.push({url:u.href,title:item.title||u.hostname,time:v.visitTime})}}))}
+ for(let i=0;i<items.length;i+=20){await Promise.all(items.slice(i,i+20).map(async item=>{let u;try{u=new URL(item.url);if(!['https:','http:'].includes(u.protocol)||u.username||u.password)return;u.search='';u.hash='';u.username='';u.password=''}catch{return}const visits=await api.history.getVisits({url:item.url});for(const v of visits){if(v.visitTime>=startTime&&v.visitTime<=endTime)records.push({url:u.href,title:item.title||u.hostname,time:v.visitTime})}}))}
+ if(!await api.permissions.contains({permissions:['history']}))throw Error('History permission was revoked during collection. No records transferred.');
  return {records,truncated:items.length===5000,startTime,endTime};
 }
 if(globalThis.chrome?.runtime?.onMessageExternal)chrome.runtime.onMessageExternal.addListener((message,sender,sendResponse)=>{handle(message,sender,chrome).then(sendResponse).catch(e=>sendResponse({error:e.message}));return true});

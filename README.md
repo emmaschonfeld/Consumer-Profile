@@ -50,4 +50,4 @@ GitHub Actions tests/builds on main and publishes `dist`. In repository Settings
 
 ## QA
 
-`pnpm test` covers imports, conversation authorship, sensitive suppression, deduplication, scoring/feedback, unsafe URLs, extension allowlisting, denied permissions, visit periods and revocation with mocked APIs. Tests are synthetic fixtures excluded from production bundles. Browser visual/interactivity testing and real extension installation must be reported separately; mocked tests do not establish Chrome installation success.
+`pnpm test` covers imports, conversation authorship, sensitive suppression, cross-filename deduplication, catalog containers and invalid prices, scoring/feedback, unsafe URLs, extension allowlisting, denied permissions, visit periods and revocation with mocked APIs, including revocation during collection. Pending reads are invalidated on session reset or disconnect. Tests are synthetic fixtures excluded from production bundles. Browser visual/interactivity testing and real extension installation must be reported separately; mocked tests do not establish Chrome installation success.

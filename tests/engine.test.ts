@@ -12,3 +12,7 @@ test('product prices are never invented; insufficient evidence and feedback bloc
 test('empty and malformed imports are explicit',()=>{assert.equal(parseImport('[]','x.json').records.length,0);assert.throws(()=>parseImport('{','x.json'));assert.throws(()=>parseImport('{"records":{}}','x.json'))});
 
 test('Google Takeout microsecond timestamps preserve the actual visit date',()=>{const result=parseImport(JSON.stringify({'Browser History':[{url:'https://example.com',title:'Example',time_usec:String(now*1000)}]}),'Takeout.json');assert.equal(result.records[0].time,now)});
+
+test('repeat imports across filenames do not inflate evidence',()=>{const row=JSON.stringify([{url:'https://apple.com/laptop',title:'Laptop review',time:now}]);assert.equal(dedupe([...parseImport(row,'first.json').records,...parseImport(row,'renamed.json').records]).length,1)});
+test('product containers accept named catalog rows and reject invalid prices',()=>{for(const price of [null,-10,' ']){const result=parseImport(JSON.stringify({products:[{name:'Laptop',url:'https://example.com/laptop',category:'Technology',price}]}),'products.json');assert.equal(result.products.length,1);assert.equal(result.products[0].name,'Laptop');assert.equal(result.products[0].price,undefined)}});
+test('null imports and null conversation rows fail safely',()=>{assert.throws(()=>parseImport('null','history.json'),/Expected/);const result=parseImport(JSON.stringify([null,{mapping:{}}]),'conversations.json');assert.equal(result.records.length,0)});

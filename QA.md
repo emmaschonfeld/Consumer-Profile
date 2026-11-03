@@ -30,3 +30,10 @@ The preview tool's explicit viewport override did not reliably switch an existin
 - Repository made public with explicit owner approval; GitHub Pages configured to use GitHub Actions. Earlier CI runs passed install, 13 tests and build, then failed because Pages was not yet enabled. The first enabled deployment reached the Pages API, which returned HTTP 500. A rerun exposed duplicate artifact names; the workflow now uses unique names per run/attempt to make retries reliable. Deployment succeeded in workflow run 41071947811. The live dashboard was opened and rendered correctly at https://emmaschonfeld.github.io/Consumer-Profile/. Its extension ZIP was downloaded and SHA-256 matched the prepared package. Real Chrome installation and personal data access remain unapproved.
 - No automatic live retailer extraction or price verification. Product links/catalogs are supported; prices are supplied snapshots and availability is unknown.
 - No personal records analyzed: 0. No personalized products can be recommended without authorized data and real catalog entries.
+
+
+## Revalidation — November 3, 2026
+
+18 synthetic automated tests pass. TypeScript strict compilation and the Vite production build pass. New regressions cover cross-filename import deduplication, catalog container recognition, invalid prices, null import/conversation rows, permission revocation during collection, and credential URL rejection. Reset/disconnect invalidate outstanding asynchronous imports so pending results cannot restore deleted data. Chrome period selection now clamps unsupported imported-data periods to 90 days. All-time trend comparison uses the actual imported date range.
+
+No personal data is committed. The owner explicitly approved extension installation and local analysis of the last 30 days in this session; real installation verification is in progress. Store publication remains pending. Instagram references could not be retrieved.
